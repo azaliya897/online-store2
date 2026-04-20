@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchItem } from "../api/api";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function Details() {
-  // useParams — достаёт id из URL (/details/5 → id = "5")
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addToCart } = useCart();
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false); // в избранном или нет
+  const [saved, setSaved] = useState(false);
 
-  // Загружаем товар, перезапрашиваем если id изменился
   useEffect(() => {
     setLoading(true);
     fetchItem(id)
@@ -23,13 +23,11 @@ export default function Details() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Проверяем — есть ли в избранном
   useEffect(() => {
     const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
     setSaved(favs.some((f) => f.id === Number(id)));
   }, [id]);
 
-  // Добавить / убрать из избранного
   const toggleFavorite = () => {
     const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
     if (saved) {
@@ -44,7 +42,7 @@ export default function Details() {
   };
 
   if (loading) return <p style={styles.center}>⏳ Загрузка...</p>;
-  if (error)   return <p style={{ ...styles.center, color: "#ff4444" }}>❌ {error}</p>;
+  if (error) return <p style={{ ...styles.center, color: "#ff4444" }}>❌ {error}</p>;
 
   return (
     <div style={styles.page}>
@@ -52,12 +50,10 @@ export default function Details() {
       <button onClick={() => navigate(-1)} style={styles.backBtn}>← Назад</button>
 
       <div style={styles.card}>
-        {/* Картинка */}
         <div style={styles.imgWrap}>
           <img src={item.image} alt={item.title} style={styles.img} />
         </div>
 
-        {/* Информация */}
         <div style={styles.info}>
           <span style={styles.badge}>{item.category}</span>
           <h2 style={styles.title}>{item.title}</h2>
@@ -66,9 +62,10 @@ export default function Details() {
           <p style={styles.inStock}>В наличии</p>
           <p style={styles.price}>{item.price} $</p>
 
-          {/* Кнопки */}
           <div style={styles.btns}>
-            <button style={styles.cartBtn}>В корзину</button>
+            <button onClick={() => addToCart(item)} style={styles.cartBtn}>
+              🛒 В корзину
+            </button>
             {user && (
               <button onClick={toggleFavorite} style={styles.favBtn}>
                 {saved ? "❤️ В избранном" : "🤍 В избранное"}
@@ -102,6 +99,7 @@ const styles = {
     borderRadius: "8px",
     marginBottom: "1.5rem",
     color: "#555",
+    cursor: "pointer",
   },
   card: {
     background: "white",
@@ -147,6 +145,7 @@ const styles = {
     borderRadius: "8px",
     fontWeight: "600",
     fontSize: "1rem",
+    cursor: "pointer",
   },
   favBtn: {
     background: "white",
@@ -154,6 +153,7 @@ const styles = {
     padding: "12px 20px",
     borderRadius: "8px",
     fontSize: "0.95rem",
+    cursor: "pointer",
   },
   adminBtns: { marginTop: "0.5rem" },
   editBtn: {
@@ -163,6 +163,7 @@ const styles = {
     padding: "10px 20px",
     borderRadius: "8px",
     fontWeight: "500",
+    cursor: "pointer",
   },
-  center: { textAlign: "center", padding: "3rem", color: "#999" },
+  center: { textAlign: "center", padding: "3rem" },
 };

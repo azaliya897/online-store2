@@ -14,14 +14,13 @@ export default function Login() {
   const validate = () => {
     const e = {};
     if (!username.trim()) e.username = "Введите имя пользователя";
-    if (!password)        e.password = "Введите пароль";
+    if (!password) e.password = "Введите пароль";
     if (password && password.length < 4) e.password = "Минимум 4 символа";
     return e;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const foundErrors = validate();
     if (Object.keys(foundErrors).length > 0) {
       setErrors(foundErrors);
@@ -29,15 +28,17 @@ export default function Login() {
     }
 
     setLoading(true);
+    await new Promise((r) => setTimeout(r, 800));
 
-    // Симулируем загрузку 800мс — принимаем ЛЮБОЙ логин и пароль
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Если логин "admin" — даём роль администратора
+    // Иначе — обычный пользователь
+    const role = username.toLowerCase() === "admin" ? "admin" : "user";
 
-    // Сохраняем пользователя — любое имя и пароль принимается
     login({
-      username: username,
+      username,
       email: username + "@shop.com",
       token: "token-" + Date.now(),
+      role, // роль сохраняется в Context и localStorage
     });
 
     setLoading(false);
@@ -48,7 +49,9 @@ export default function Login() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h2 style={styles.title}>Вход</h2>
-        <p style={styles.hint}>Введите любое имя и пароль</p>
+        <p style={styles.hint}>
+          Любой логин/пароль · Для админа введи <b>admin</b>
+        </p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.field}>
@@ -57,7 +60,7 @@ export default function Login() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Любое имя"
+              placeholder="Любое имя (admin для доступа к панели)"
               style={{ ...styles.input, ...(errors.username ? styles.inputErr : {}) }}
             />
             {errors.username && <span style={styles.errText}>{errors.username}</span>}

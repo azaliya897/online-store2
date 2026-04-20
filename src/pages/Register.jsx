@@ -3,7 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
-  const [form, setForm] = useState({ username: "", email: "", password: "", confirm: "" });
+  const [form, setForm] = useState({
+    username: "", email: "", password: "", confirm: "", role: "user",
+  });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -31,25 +33,18 @@ export default function Register() {
     if (Object.keys(foundErrors).length > 0) { setErrors(foundErrors); return; }
 
     setLoading(true);
-    // Симулируем задержку — принимаем любые данные
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((r) => setTimeout(r, 800));
 
     login({
       username: form.username,
       email: form.email,
       token: "token-" + Date.now(),
+      role: form.role, // роль выбранная при регистрации
     });
 
     setLoading(false);
     navigate("/dashboard");
   };
-
-  const fields = [
-    { name: "username", label: "Имя пользователя", type: "text",     placeholder: "Любое имя" },
-    { name: "email",    label: "Email",             type: "email",    placeholder: "email@mail.ru" },
-    { name: "password", label: "Пароль",            type: "password", placeholder: "Минимум 4 символа" },
-    { name: "confirm",  label: "Повторите пароль",  type: "password", placeholder: "Повторите пароль" },
-  ];
 
   return (
     <div style={styles.page}>
@@ -57,7 +52,12 @@ export default function Register() {
         <h2 style={styles.title}>Регистрация</h2>
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          {fields.map(({ name, label, type, placeholder }) => (
+          {[
+            { name: "username", label: "Имя пользователя", type: "text",     placeholder: "Любое имя" },
+            { name: "email",    label: "Email",             type: "email",    placeholder: "email@mail.ru" },
+            { name: "password", label: "Пароль",            type: "password", placeholder: "Минимум 4 символа" },
+            { name: "confirm",  label: "Повторите пароль",  type: "password", placeholder: "Повторите пароль" },
+          ].map(({ name, label, type, placeholder }) => (
             <div key={name} style={styles.field}>
               <label style={styles.label}>{label}</label>
               <input
@@ -71,6 +71,20 @@ export default function Register() {
               {errors[name] && <span style={styles.errText}>{errors[name]}</span>}
             </div>
           ))}
+
+          {/* Выбор роли при регистрации */}
+          <div style={styles.field}>
+            <label style={styles.label}>Роль</label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              style={styles.input}
+            >
+              <option value="user">Пользователь</option>
+              <option value="admin">Администратор</option>
+            </select>
+          </div>
 
           <button type="submit" disabled={loading} style={styles.btn}>
             {loading ? "Создаём аккаунт..." : "Зарегистрироваться"}
@@ -93,7 +107,7 @@ const styles = {
   form: { display: "flex", flexDirection: "column", gap: "1rem" },
   field: { display: "flex", flexDirection: "column", gap: "5px" },
   label: { fontSize: "0.9rem", fontWeight: "500", color: "#333" },
-  input: { padding: "11px 14px", border: "1.5px solid #e8e8e8", borderRadius: "8px", fontSize: "1rem" },
+  input: { padding: "11px 14px", border: "1.5px solid #e8e8e8", borderRadius: "8px", fontSize: "1rem", fontFamily: "inherit" },
   inputErr: { borderColor: "#ff4444" },
   errText: { color: "#ff4444", fontSize: "0.8rem" },
   btn: { padding: "13px", background: "#6c4ef2", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: "600" },

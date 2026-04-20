@@ -13,7 +13,7 @@ import Edit from "./pages/Edit";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import Favorites from "./pages/Favorites";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanel from "./pages/AdminPanel";  // ← ЭТО ДОБАВИТЬ
 import NotFound from "./pages/NotFound";
 import Cart from "./pages/Cart";
 
@@ -39,7 +39,7 @@ function AppRoutes() {
         <Route path="/edit/:id" element={<ProtectedRoute><Edit /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />  {/* ← ЭТО ДОБАВИТЬ */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

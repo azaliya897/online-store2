@@ -1,73 +1,49 @@
 const API_URL = 'https://dummyjson.com/products';
 
-// Все категории техники
+// Соответствие ваших категорий и категорий из API
+const CATEGORY_MAP = {
+  'Смартфоны': 'smartphones',
+  'Ноутбуки': 'laptops',
+  'Телевизоры': 'tv',
+  'Наушники': 'headphones',
+  'Смарт-часы': 'smartwatches',
+  'Планшеты': 'tablets',
+  'Колонки': 'speakers',
+  'Игры и гаджеты': 'gaming'
+};
+
+// Все категории техники из API
 const TECH_CATEGORIES = [
-  'smartphones',
-  'laptops',
-  'tablets',
-  'mobile-accessories',
-  'laptops-accessories',
-  'computer-accessories',
-  'audio',
-  'headphones',
-  'earphones',
-  'smart-home',
-  'home-automation',
-  'gaming',
-  'gaming-accessories',
-  'tv',
-  'televisions',
-  'monitors',
-  'cameras',
-  'drones',
-  'wearable-technology',
-  'smartwatches',
-  'power-banks',
-  'chargers',
-  'cables',
-  'speakers',
-  'bluetooth-speakers'
+  'smartphones', 'laptops', 'tablets', 'tv', 'headphones', 
+  'smartwatches', 'speakers', 'gaming', 'mobile-accessories',
+  'audio', 'cameras', 'monitors', 'wearable-technology'
 ];
 
 function transformProduct(product) {
-  // Определяем подкатегорию для отображения
+  // Определяем категорию для отображения
   let displayCategory = product.category;
-  
-  const categoryMap = {
-    'smartphones': 'Смартфоны',
-    'laptops': 'Ноутбуки',
-    'tablets': 'Планшеты',
-    'tv': 'Телевизоры',
-    'televisions': 'Телевизоры',
-    'monitors': 'Мониторы',
-    'headphones': 'Наушники',
-    'audio': 'Аудиотехника',
-    'speakers': 'Колонки',
-    'smart-home': 'Умный дом',
-    'gaming': 'Игровые устройства',
-    'cameras': 'Фототехника',
-    'smartwatches': 'Смарт-часы',
-    'wearable-technology': 'Гаджеты',
-    'mobile-accessories': 'Аксессуары'
+  const reverseMap = {
+    'smartphones': 'Смартфоны', 'laptops': 'Ноутбуки', 'tablets': 'Планшеты',
+    'tv': 'Телевизоры', 'headphones': 'Наушники', 'smartwatches': 'Смарт-часы',
+    'speakers': 'Колонки', 'gaming': 'Игры и гаджеты', 'mobile-accessories': 'Аксессуары',
+    'audio': 'Аудиотехника', 'cameras': 'Фототехника', 'monitors': 'Мониторы'
   };
   
   return {
-    ...product,
-    image: product.thumbnail,
-    price: product.price,
+    id: product.id,
     title: product.title,
-    category: categoryMap[product.category] || product.category,
-    originalCategory: product.category,
+    price: product.price,
+    category: reverseMap[product.category] || product.category,
+    image: product.thumbnail,
     description: product.description,
-    rating: product.rating,
-    stock: product.stock,
-    brand: product.brand
+    rating: { rate: product.rating || 4.5 },
+    stock: product.stock
   };
 }
 
-export async function fetchItems(limit = 200) {
+export const fetchItems = async () => {
   try {
-    const response = await fetch(`${API_URL}?limit=${limit}`);
+    const response = await fetch(`${API_URL}?limit=150`);
     const data = await response.json();
     // Фильтруем только технику
     const techProducts = data.products.filter(product => 
@@ -78,64 +54,36 @@ export async function fetchItems(limit = 200) {
     console.error('Ошибка загрузки:', error);
     return [];
   }
-}
+};
 
-// Получить товары по категории
-export async function fetchByCategory(category, limit = 50) {
-  try {
-    const response = await fetch(`${API_URL}/category/${category}?limit=${limit}`);
-    const data = await response.json();
-    return data.products.map(transformProduct);
-  } catch (error) {
-    console.error('Ошибка загрузки категории:', error);
-    return [];
-  }
-}
-
-export async function fetchItemById(id) {
+export const fetchItem = async (id) => {
   try {
     const response = await fetch(`${API_URL}/${id}`);
     const product = await response.json();
-    if (!TECH_CATEGORIES.includes(product.category)) {
-      return null;
-    }
+    if (!TECH_CATEGORIES.includes(product.category)) return null;
     return transformProduct(product);
   } catch (error) {
     console.error('Ошибка загрузки товара:', error);
     return null;
   }
-}
+};
 
-export async function fetchItem(id) {
-  return fetchItemById(id);
-}
+export const createItem = async (data) => {
+  return { ...data, id: Date.now() };
+};
 
-export async function createItem(item) {
-  return { ...item, id: Date.now(), image: item.image || item.thumbnail };
-}
+export const updateItem = async (id, data) => {
+  return { ...data, id };
+};
 
-export async function fetchUsers() {
+export const deleteItem = async (id) => {
+  return { success: true };
+};
+
+export const fetchUsers = async () => {
   return [
-    { id: 1, username: 'admin', email: 'admin@example.com', role: 'admin' },
-    { id: 2, username: 'user1', email: 'user1@example.com', role: 'user' },
-    { id: 3, username: 'user2', email: 'user2@example.com', role: 'user' },
+    { id: 1, name: { firstname: 'Admin', lastname: '' }, email: 'admin@shop.com', address: { city: 'Moscow' } },
+    { id: 2, name: { firstname: 'John', lastname: 'Doe' }, email: 'user@mail.com', address: { city: 'SPb' } },
   ];
-}
+};
 
-export async function deleteItem(id) {
-  try {
-    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    return await response.json();
-  } catch (error) {
-    console.error('Ошибка удаления:', error);
-    return null;
-  }
-}
-
-export async function addItem(item) {
-  return { ...item, id: Date.now() };
-}
-
-export async function updateItem(id, updatedData) {
-  return { id, ...updatedData };
-}

@@ -17,7 +17,19 @@ export default function Edit() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
 
-  // Загружаем данные товара чтобы заполнить форму
+  // Категории техники (как на главной)
+  const categories = [
+    "Смартфоны",
+    "Ноутбуки",
+    "Телевизоры",
+    "Наушники",
+    "Смарт-часы",
+    "Планшеты",
+    "Колонки",
+    "Игры и гаджеты",
+    "Аксессуары"
+  ];
+
   useEffect(() => {
     fetchItem(id)
       .then((item) => {
@@ -39,7 +51,7 @@ export default function Edit() {
 
   const validate = () => {
     const e = {};
-    if (!form.title.trim())             e.title = "Введите название";
+    if (!form.title.trim()) e.title = "Введите название";
     if (!form.price || form.price <= 0) e.price = "Введите цену";
     return e;
   };
@@ -69,7 +81,7 @@ export default function Edit() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.title}>Редактировать товар</h2>
+        <h2 style={styles.title}>✏️ Редактировать товар</h2>
 
         {success && (
           <div style={styles.successBox}>✅ Сохранено! Возвращаемся...</div>
@@ -96,6 +108,7 @@ export default function Edit() {
             <input
               name="price"
               type="number"
+              step="0.01"
               value={form.price}
               onChange={handleChange}
               style={{ ...styles.input, ...(errors.price ? styles.inputErr : {}) }}
@@ -115,17 +128,16 @@ export default function Edit() {
           </div>
 
           <div style={styles.field}>
-            <label style={styles.label}>Категория</label>
+            <label style={styles.label}>Категория *</label>
             <select
               name="category"
               value={form.category}
               onChange={handleChange}
               style={styles.input}
             >
-              <option value="electronics">Электроника</option>
-              <option value="jewelery">Украшения</option>
-              <option value="men's clothing">Мужская одежда</option>
-              <option value="women's clothing">Женская одежда</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
@@ -201,6 +213,7 @@ const styles = {
     border: "1.5px solid #e8e8e8",
     borderRadius: "8px",
     fontSize: "1rem",
+    cursor: "pointer",
   },
   submitBtn: {
     flex: 2,
@@ -211,5 +224,6 @@ const styles = {
     borderRadius: "8px",
     fontSize: "1rem",
     fontWeight: "600",
+    cursor: "pointer",
   },
 };
