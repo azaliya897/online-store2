@@ -1,16 +1,5 @@
 const API_URL = 'https://dummyjson.com/products';
 
-// Соответствие ваших категорий и категорий из API
-const CATEGORY_MAP = {
-  'Смартфоны': 'smartphones',
-  'Ноутбуки': 'laptops',
-  'Телевизоры': 'tv',
-  'Наушники': 'headphones',
-  'Смарт-часы': 'smartwatches',
-  'Планшеты': 'tablets',
-  'Колонки': 'speakers',
-  'Игры и гаджеты': 'gaming'
-};
 
 // Все категории техники из API
 const TECH_CATEGORIES = [
@@ -21,7 +10,6 @@ const TECH_CATEGORIES = [
 
 function transformProduct(product) {
   // Определяем категорию для отображения
-  let displayCategory = product.category;
   const reverseMap = {
     'smartphones': 'Смартфоны', 'laptops': 'Ноутбуки', 'tablets': 'Планшеты',
     'tv': 'Телевизоры', 'headphones': 'Наушники', 'smartwatches': 'Смарт-часы',
