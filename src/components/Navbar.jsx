@@ -39,13 +39,20 @@ export default function Navbar() {
                 <span>📊</span>
                 <span style={styles.navLabel}>Dashboard</span>
               </Link>
+
               <Link to="/profile" style={styles.navItem}>
                 <span>👤</span>
-                <span style={styles.navLabel}>{user.username}</span>
+                <span style={styles.navLabel}>
+                  {user.username || "User"}
+                </span>
               </Link>
-              {isAdmin && isAdmin() && (
-                <Link to="/admin" style={styles.adminBtn}>🔧 Admin</Link>
+
+              {isAdmin && (
+                <Link to="/admin" style={styles.adminBtn}>
+                  🔧 Admin
+                </Link>
               )}
+
               <button onClick={handleLogout} style={styles.logoutBtn}>
                 Выйти
               </button>
@@ -56,6 +63,7 @@ export default function Navbar() {
                 <span>👤</span>
                 <span style={styles.navLabel}>Войти</span>
               </Link>
+
               <Link to="/register" style={styles.registerBtn}>
                 Регистрация
               </Link>
